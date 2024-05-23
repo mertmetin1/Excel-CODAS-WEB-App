@@ -14,7 +14,7 @@ To run this project, you will need the following requirements:
 
 ## Application Structure
 
-```plaintext
+```
 flask_app/
 ├── uploads/
 ├── CODAS.py
