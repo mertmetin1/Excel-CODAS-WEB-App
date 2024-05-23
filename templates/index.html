@@ -1,0 +1,89 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CODAS Results</title>
+</head>
+<body>
+    <!-- Button to export tables to Excel -->
+    <button onclick="exportToExcel()">Export as Excel</button>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="input_excel" accept=".xlsx, .xls">
+        <button type="submit">Upload Excel</button>
+    </form>
+    {% if html_table %}
+    <h2>Uploaded Excel Data</h2>
+    {{ html_table | safe }}
+    {% endif %}
+    <h1> Results</h1>
+    {% if result %}
+    <h2>Normalized Weighted Matrix</h2>
+    {{ result[0].to_html() | safe }}
+    
+    <h5>Min Values:  {{ result[6]| safe }}</h5> 
+    <br>
+   
+    
+    <h2>Euclidean Distances</h2>
+    {{ result[1].to_html() | safe }}
+    
+    <h2>Taxicab Distances</h2>
+    {{ result[2].to_html() | safe }}
+    
+    <h2>Relative Assessment Matrix</h2>
+    {{ result[3].to_html() | safe }}
+    
+    <h2>Rankings and Assessment Sums</h2>
+    <table border="1">
+        <tr>
+            <th>Rank</th>
+            <th>Assessment Sum</th>
+        </tr>
+        {% for i in range(result[4] | length) %}
+        <tr>
+            <td>{{ result[4][i] }}</td>
+            <td>{{ result[5][i] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+
+    
+
+    
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+    
+
+
+     <!-- JavaScript to export tables to Excel -->
+     <script>
+        function exportToExcel() {
+            var tables = document.querySelectorAll('table'); // Get all tables
+            var blob = new Blob([tablesToExcel(tables)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'codas_results.xlsx';
+            a.click();
+        }
+
+        function tablesToExcel(tables) {
+            var content = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body>';
+            tables.forEach(function(table) {
+                content += '<table>' + table.innerHTML + '</table><br>';
+            });
+            content += '</body></html>';
+            return content;
+        }
+    </script>
+
+
+</body>
+</html>
+{% endblock %}
